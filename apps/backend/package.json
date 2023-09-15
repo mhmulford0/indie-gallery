@@ -1,0 +1,27 @@
+{
+  "name": "backend",
+  "version": "1.0.0",
+  "description": "",
+  "type": "module",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "build": "tsc",
+    "start": "tsc && node ./dist/main.js",
+    "dev": "tsx watch ./src/main.ts"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "cors": "^2.8.5",
+    "ethers": "^6.7.1",
+    "h3": "^1.8.1",
+    "listhen": "^1.5.3",
+    "siwe": "^2.1.4"
+  },
+  "devDependencies": {
+    "@types/node": "18.17",
+    "tsx": "^3.12.10",
+    "typescript": "^5.1.6"
+  }
+}
