@@ -1,24 +1,43 @@
+import 'dotenv/config';
 import Fastify from 'fastify';
 import cors from '@fastify/cors';
+import secureSession from '@fastify/secure-session';
 import { generateNonce, SiweMessage } from 'siwe';
 
-const f = Fastify();
+if (!process.env.COOKIE_SECRET) {
+    throw new Error('Cookie secret must be set');
+}
+
+const f = Fastify({ logger: true });
 
 await f.register(cors, {
-    origin: '*',
+    origin: ['http://localhost:3000'],
     methods: ['GET', 'POST'],
     credentials: true,
     preflightContinue: true,
     hideOptionsRoute: true,
     maxAge: 600,
 });
-
+await f.register(secureSession, {
+    secret: process.env.COOKIE_SECRET,
+    salt: 'mq9hDxBVDbspDR6n',
+    cookie: {
+        path: '/',
+        httpOnly: true,
+        expires: new Date(new Date().setDate(new Date().getDate() + 7)),
+    },
+});
 // Declare a route
 f.get('/', (request, reply) => {
     reply.send({ hello: 'world' });
 });
 
 f.get('/nonce', (req, res) => {
+    res.send(generateNonce());
+});
+
+f.get('/session', (req, res) => {
+    console.log(req.session.data());
     res.send(generateNonce());
 });
 
@@ -30,8 +49,9 @@ f.post<{ Body: { message?: string; signature?: string } }>('/verify', async (req
     const { message, signature } = req.body;
     const siweMessage = new SiweMessage(message);
     try {
-        const sig = await siweMessage.verify({ signature });
-        console.log({ sig });
+        await siweMessage.verify({ signature });
+        req.session.set('address', 'yeet');
+
         res.send(true);
     } catch {
         res.send(false);

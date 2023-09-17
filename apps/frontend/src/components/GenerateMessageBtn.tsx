@@ -3,13 +3,7 @@ import { SiweMessage } from "siwe";
 import { useSignMessage, useAccount } from "wagmi";
 
 export default function GenerateMessageBtn() {
-  const {
-    data: signMessageData,
-    error,
-    isLoading,
-    signMessageAsync,
-    variables,
-  } = useSignMessage();
+  const { signMessageAsync } = useSignMessage();
   const { address } = useAccount();
   const [domain, setDomain] = useState("");
   const [origin, setOrigin] = useState("");
@@ -28,10 +22,10 @@ export default function GenerateMessageBtn() {
         const nonce = await res.text();
         try {
           const message = new SiweMessage({
-            domain: window.location.host,
+            domain,
             address,
             statement: "Sign in with Ethereum to the app.",
-            uri: window.location.origin,
+            uri: origin,
             version: "1",
             chainId: 1,
             nonce: nonce,
@@ -42,6 +36,7 @@ export default function GenerateMessageBtn() {
 
           const res = await fetch("http://localhost:3001/verify", {
             method: "POST",
+            credentials: "include",
             headers: {
               "Content-Type": "application/json",
             },

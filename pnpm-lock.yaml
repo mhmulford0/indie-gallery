@@ -17,9 +17,18 @@ importers:
 
   apps/backend:
     dependencies:
+      '@fastify/cookie':
+        specifier: ^9.0.4
+        version: 9.0.4
       '@fastify/cors':
         specifier: ^8.3.0
         version: 8.3.0
+      '@fastify/secure-session':
+        specifier: ^7.1.0
+        version: 7.1.0
+      dotenv:
+        specifier: ^16.3.1
+        version: 16.3.1
       ethers:
         specifier: ^6.7.1
         version: 6.7.1
@@ -450,6 +459,13 @@ packages:
       fast-uri: 2.2.0
     dev: false
 
+  /@fastify/cookie@9.0.4:
+    resolution: {integrity: sha512-behLOTH2u7fSZ6+TWeW8XUCmpEstwl8ysxzyb4QRxnKyt80O2S4yVfNbBZQcG9rktjeZXfR7LLl9xXKL4vdjlQ==}
+    dependencies:
+      cookie: 0.5.0
+      fastify-plugin: 4.5.1
+    dev: false
+
   /@fastify/cors@8.3.0:
     resolution: {integrity: sha512-oj9xkka2Tg0MrwuKhsSUumcAkfp2YCnKxmFEusi01pjk1YrdDsuSYTHXEelWNW+ilSy/ApZq0c2SvhKrLX0H1g==}
     dependencies:
@@ -469,6 +485,15 @@ packages:
     resolution: {integrity: sha512-aZAXGYo6m22Fk1zZzEUKBvut/CIIQe/BapEORnxiD5Qr0kPHqqI69NtEMCme74h+at72sPhbkb4ZrLd1W3KRLA==}
     dependencies:
       fast-json-stringify: 5.8.0
+    dev: false
+
+  /@fastify/secure-session@7.1.0:
+    resolution: {integrity: sha512-x0ZW57+sf6fQaL05B3n64m7DRe81NAtFAKpCKKuqdX9FDqzOH5uQbfDDfVQy2/qhDn3N343RMlNtY1iQyvvA9A==}
+    hasBin: true
+    dependencies:
+      '@fastify/cookie': 9.0.4
+      fastify-plugin: 4.5.1
+      sodium-native: 4.0.4
     dev: false
 
   /@humanwhocodes/config-array@0.11.11:
@@ -2577,6 +2602,11 @@ packages:
     dependencies:
       esutils: 2.0.3
     dev: true
+
+  /dotenv@16.3.1:
+    resolution: {integrity: sha512-IPzF4w4/Rd94bA9imS68tZBaYyBWSCE47V1RGuMrB94iyTOIEwRmVL2x/4An+6mETpLrKJ5hQkB8W4kFAadeIQ==}
+    engines: {node: '>=12'}
+    dev: false
 
   /duplexify@4.1.2:
     resolution: {integrity: sha512-fz3OjcNCHmRP12MJoZMPglx8m4rrFP8rovnk4vT8Fs+aonZoCwGg10dSsQsfP/E62eZcPTMSMP6686fu9Qlqtw==}
@@ -5102,6 +5132,13 @@ packages:
     resolution: {integrity: sha512-g9Q1haeby36OSStwb4ntCGGGaKsaVSjQ68fBxoQcutl5fS1vuY18H3wSt3jFyFtrkx+Kz0V1G85A4MyAdDMi2Q==}
     engines: {node: '>=8'}
     dev: true
+
+  /sodium-native@4.0.4:
+    resolution: {integrity: sha512-faqOKw4WQKK7r/ybn6Lqo1F9+L5T6NlBJJYvpxbZPetpWylUVqz449mvlwIBKBqxEHbWakWuOlUt8J3Qpc4sWw==}
+    requiresBuild: true
+    dependencies:
+      node-gyp-build: 4.6.1
+    dev: false
 
   /sonic-boom@2.8.0:
     resolution: {integrity: sha512-kuonw1YOYYNOve5iHdSahXPOK49GqwA+LZhI6Wz/l0rP57iKyXXIHaRagOBHAPmGwJC6od2Z9zgvZ5loSgMlVg==}

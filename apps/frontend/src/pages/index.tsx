@@ -23,6 +23,15 @@ export default function Home() {
           {address}
         </span>
         <GenerateMessageBtn />
+
+        <button
+          className="my-2 h-8 w-48 rounded-md bg-teal-500"
+          onClick={async () => {
+            fetch("http://localhost:3001/session", { credentials: "include" });
+          }}
+        >
+          Sess
+        </button>
       </main>
     </>
   );
