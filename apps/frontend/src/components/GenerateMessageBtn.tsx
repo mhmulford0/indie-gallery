@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { SiweMessage } from "siwe";
 import { useSignMessage, useAccount } from "wagmi";
+import { Button } from "~/components/ui/button";
 
 export default function GenerateMessageBtn() {
   const { signMessageAsync } = useSignMessage();
@@ -14,8 +15,9 @@ export default function GenerateMessageBtn() {
   }, []);
 
   return (
-    <button
-      className="w-64 bg-slate-600"
+    <Button
+      variant="default"
+      className="bg-primary"
       onClick={async () => {
         if (!address) return;
         const res = await fetch(`http://localhost:3001/nonce`);
@@ -47,7 +49,7 @@ export default function GenerateMessageBtn() {
         } catch (e: unknown) {}
       }}
     >
-      Generate Message
-    </button>
+      Log In
+    </Button>
   );
 }

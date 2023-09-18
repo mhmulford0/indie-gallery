@@ -2,13 +2,35 @@ import 'dotenv/config';
 import Fastify from 'fastify';
 import cors from '@fastify/cors';
 import secureSession from '@fastify/secure-session';
+import { FastifySSEPlugin } from 'fastify-sse-v2';
 import { generateNonce, SiweMessage } from 'siwe';
+import { Network, Alchemy } from 'alchemy-sdk';
 
-if (!process.env.COOKIE_SECRET) {
-    throw new Error('Cookie secret must be set');
+type Message = {
+    domain: string;
+    address: string;
+    statement: string;
+    uri: string;
+    version: string;
+    chainId: number;
+    nonce: string;
+    issuedAt: string;
+};
+
+if (!process.env.COOKIE_SECRET || !process.env.ALCHEMY_ID) {
+    throw new Error('envs must be set must be set');
 }
 
+const settings = {
+    apiKey: 'demo', // Replace with your Alchemy API Key.
+    network: Network.ETH_MAINNET, // Replace with your network.
+};
+
+const alchemy = new Alchemy(settings);
+
 const f = Fastify({ logger: true });
+
+// Plugin Setup
 
 await f.register(cors, {
     origin: ['http://localhost:3000'],
@@ -27,7 +49,10 @@ await f.register(secureSession, {
         expires: new Date(new Date().setDate(new Date().getDate() + 7)),
     },
 });
-// Declare a route
+f.register(FastifySSEPlugin);
+
+// Routes & Handlers
+
 f.get('/', (request, reply) => {
     reply.send({ hello: 'world' });
 });
@@ -41,16 +66,42 @@ f.get('/session', (req, res) => {
     res.send(generateNonce());
 });
 
-f.post<{ Body: { message?: string; signature?: string } }>('/verify', async (req, res) => {
+f.get('/nfts', async (req, res) => {
+    res.header('Content-Type', 'text/event-stream')
+        .header('Cache-Control', 'no-cache')
+        .header('Connection', 'keep-alive');
+
+    const address = req.session.get('address') as string;
+
+    if (!address || address.length !== 42) {
+        res.status(400).send({ error: 'incorrect wallet address' });
+    }
+
+    const nfts = await alchemy.nft.getNftsForOwner(address);
+    console.log(nfts.ownedNfts);
+
+    res.sse(
+        (async function* source() {
+            for (const nft of nfts.ownedNfts) {
+                // const data = `data: ${JSON.stringify(nft)}\n\n`;
+                yield { id: String(nft.title), data: JSON.stringify(nft) };
+            }
+        })(),
+    );
+});
+
+f.post<{ Body: { message?: Message; signature?: string } }>('/verify', async (req, res) => {
     if (!req.body.message || !req.body.signature) {
         return res.status(400).send();
     }
 
     const { message, signature } = req.body;
+
+    console.log({ message }, { signature });
     const siweMessage = new SiweMessage(message);
     try {
         await siweMessage.verify({ signature });
-        req.session.set('address', 'yeet');
+        req.session.set('address', message.address);
 
         res.send(true);
     } catch {
@@ -58,10 +109,11 @@ f.post<{ Body: { message?: string; signature?: string } }>('/verify', async (req
     }
 });
 
-f.listen({ port: 3001, host: '0.0.0.0' }, function (err, address) {
+// Start Server
+
+f.listen({ port: 3001, host: '0.0.0.0' }, function (err) {
     if (err) {
         f.log.error(err);
         process.exit(1);
     }
-    // Server is now listening on ${address}
 });

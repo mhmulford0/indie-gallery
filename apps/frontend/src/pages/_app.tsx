@@ -13,6 +13,7 @@ import { configureChains, createConfig, WagmiConfig } from "wagmi";
 import { mainnet } from "wagmi/chains";
 import { alchemyProvider } from "wagmi/providers/alchemy";
 import { publicProvider } from "wagmi/providers/public";
+import { ThemeProvider } from "~/components/ThemeProvider";
 
 if (!process.env.NEXT_PUBLIC_ALCHEMY_ID) {
   throw new Error("Please supply api key");
@@ -42,7 +43,9 @@ const MyApp: AppType = ({ Component, pageProps }) => {
   return (
     <WagmiConfig config={wagmiConfig}>
       <RainbowKitProvider chains={chains} theme={darkTheme()}>
-        <Component {...pageProps} />
+        <ThemeProvider attribute="class" defaultTheme="system">
+          <Component {...pageProps} />
+        </ThemeProvider>
       </RainbowKitProvider>
     </WagmiConfig>
   );
