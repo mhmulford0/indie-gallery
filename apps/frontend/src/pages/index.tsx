@@ -1,6 +1,7 @@
 import { ConnectButton } from "@rainbow-me/rainbowkit";
 import dynamic from "next/dynamic";
 import Head from "next/head";
+import { useEffect, useState } from "react";
 import { useAccount } from "wagmi";
 const GenerateMessageBtn = dynamic(
   () => import("~/components/GenerateMessageBtn"),
@@ -11,6 +12,28 @@ const GenerateMessageBtn = dynamic(
 
 export default function Home() {
   const { address } = useAccount();
+  const [data, setData] = useState<any[]>([]);
+
+  useEffect(() => {
+    if (!address) return;
+    const eventSource = new EventSource("http://localhost:3001/nfts", {
+      withCredentials: true,
+    });
+
+    eventSource.onmessage = (event) => {
+      console.log(JSON.parse(event.data));
+    };
+
+    eventSource.onerror = (error) => {
+      console.error("EventSource failed:", error);
+      eventSource.close();
+    };
+
+    return () => {
+      eventSource.close();
+    };
+  }, []);
+
   return (
     <>
       <Head>

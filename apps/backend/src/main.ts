@@ -22,7 +22,7 @@ if (!process.env.COOKIE_SECRET || !process.env.ALCHEMY_ID) {
 }
 
 const settings = {
-    apiKey: 'demo', // Replace with your Alchemy API Key.
+    apiKey: process.env.ALCHEMY_ID, // Replace with your Alchemy API Key.
     network: Network.ETH_MAINNET, // Replace with your network.
 };
 
@@ -67,15 +67,13 @@ f.get('/session', (req, res) => {
 });
 
 f.get('/nfts', async (req, res) => {
-    res.header('Content-Type', 'text/event-stream')
-        .header('Cache-Control', 'no-cache')
-        .header('Connection', 'keep-alive');
-
     const address = req.session.get('address') as string;
 
     if (!address || address.length !== 42) {
         res.status(400).send({ error: 'incorrect wallet address' });
     }
+
+    console.log(address);
 
     const nfts = await alchemy.nft.getNftsForOwner(address);
     console.log(nfts.ownedNfts);
@@ -83,8 +81,7 @@ f.get('/nfts', async (req, res) => {
     res.sse(
         (async function* source() {
             for (const nft of nfts.ownedNfts) {
-                // const data = `data: ${JSON.stringify(nft)}\n\n`;
-                yield { id: String(nft.title), data: JSON.stringify(nft) };
+                yield { id: String(nft.tokenId + nft.title), data: JSON.stringify(nft) };
             }
         })(),
     );
